@@ -3,6 +3,9 @@ const userController = require('../controllers/user.controller');
 const router = new Router();
 const { body } = require('express-validator');
 
+/**
+ * добавляем нужные эндпоинты
+ */
 router.post(
     '/registration',
     [
