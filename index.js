@@ -27,6 +27,7 @@ app.use('/api', router);
 
 /**
  * добавляем Middleware для обработки ошибок
+ * обязательно должен идти последним в цепочке
  */
 app.use(errorMiddleware);
 

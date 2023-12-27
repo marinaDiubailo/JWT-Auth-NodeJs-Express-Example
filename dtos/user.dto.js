@@ -9,3 +9,6 @@ module.exports = class UserDto {
         this.isActivated = model.isActivated;
     }
 };
+/**
+ * Data transfer object
+ */

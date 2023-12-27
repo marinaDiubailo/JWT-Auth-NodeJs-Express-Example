@@ -8,25 +8,52 @@ const ApiError = require('../exceptions/api.error');
 
 class UserService {
     async registration(email, password) {
+        /**
+         * достаем юзера из бд
+         */
         const candidate = await UserModel.findOne({ email });
+        /**
+         * проверяем, если такой есть, то пробрасываем ошибку
+         */
         if (candidate) {
             throw ApiError.BadRequest(
                 'Пользователь с такий email уже существует',
             );
         }
+        /**
+         * хэшируем пароль
+         */
         const hashedPassword = await bcrypt.hash(password, 3);
+        /**
+         * создаем линк для активации аккаунта
+         */
         const activationLink = uuid.v4();
+        /**
+         * создаем юзера в бд
+         */
         const user = await UserModel.create({
             email,
             password: hashedPassword,
             activationLink,
         });
+        /**
+         * отправляем ссылку по почте
+         */
         await mailService.sendActivationMail(
             email,
             `${process.env.API_URL}/api/activate/${activationLink}`,
         );
+        /**
+         * создаем дто юзера
+         */
         const userDto = new UserDto(user);
+        /**
+         * генерируем токены
+         */
         const tokens = tokenService.generateTokens({ ...userDto });
+        /**
+         * сохраняем токены в бд
+         */
         await tokenService.saveToken(userDto.id, tokens.refreshToken);
 
         return {
@@ -84,6 +111,11 @@ class UserService {
             ...tokens,
             user: userDto,
         };
+    }
+
+    async getAllUsers() {
+        const users = await UserModel.find();
+        return users;
     }
 }
 module.exports = new UserService();
