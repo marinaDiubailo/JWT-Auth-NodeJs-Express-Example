@@ -1,4 +1,5 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, './.env.local') });
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -18,7 +19,16 @@ const app = express();
  */
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors());
+
+/**
+ * разрешаем куки, указываем url фронта
+ */
+app.use(
+    cors({
+        credentials: true,
+        origin: process.env.CLIENT_URL,
+    }),
+);
 
 /**
  * добавляем маршрутизацию
@@ -43,5 +53,7 @@ const start = async () => {
         console.log(error);
     }
 };
+
+console.log(process.env.DB_URL);
 
 start();
