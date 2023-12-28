@@ -54,6 +54,4 @@ const start = async () => {
     }
 };
 
-console.log(process.env.DB_URL);
-
 start();
