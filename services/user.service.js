@@ -94,14 +94,17 @@ class UserService {
   }
 
   async refresh(refreshToken) {
-    if (!refreshToken) throw ApiError.UnauthorizedError();
+    if (!refreshToken) {
+      throw ApiError.UnauthorizedError();
+    }
 
     const userData = tokenService.validateRefreshToken(refreshToken);
     const tokenFormDB = await tokenService.findToken(refreshToken);
     if (!userData || !tokenFormDB) {
       throw ApiError.UnauthorizedError();
     }
-    const user = UserModel.findById(userData.id);
+
+    const user = await UserModel.findById(userData.id);
     const userDto = new UserDto(user);
     const tokens = tokenService.generateTokens({ ...userDto });
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
@@ -114,8 +117,9 @@ class UserService {
 
   async getAllUsers() {
     const users = await UserModel.find();
-    console.log(users);
-    return users;
+    const result = users.map((user) => new UserDto(user));
+    console.log(result);
+    return result;
   }
 }
 module.exports = new UserService();
